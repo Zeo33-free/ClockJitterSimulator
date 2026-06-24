@@ -146,10 +146,10 @@ inline float JitterClockSimAudioProcessor::randUni()
 // 4-point Catmull-Rom cubic interpolation
 // ==============================================================================
 float JitterClockSimAudioProcessor::readCubic (const std::vector<float>& buf,
-                                               float pos) const
+                                               double pos) const
 {
     int   base = static_cast<int> (std::floor (pos));
-    float frac = pos - static_cast<float> (base);
+    float frac = static_cast<float> (pos - static_cast<double> (base));
 
     int im1 = (base - 1) & kOSMask;
     int i0  =  base      & kOSMask;
@@ -213,7 +213,7 @@ void JitterClockSimAudioProcessor::parameterChanged (const juce::String& paramID
     std::fill (osBufR.begin(), osBufR.end(), 0.0f);
     inPos = 0;
     float firDelay = (firLength - 1) * 0.5f;
-    wpos = firDelay + static_cast<float> (oversample);
+    wpos = firDelay + oversample;
     rpos = wpos - firDelay;
     rng = 1234567;
     setupIIR (currentSampleRate);
@@ -245,7 +245,7 @@ void JitterClockSimAudioProcessor::prepareToPlay (double sampleRate, int maxSamp
     // Reset cursors
     inPos = 0;
     float firDelay = (firLength - 1) * 0.5f;
-    wpos = firDelay + static_cast<float> (oversample);
+    wpos = firDelay + oversample;
     rpos = wpos - firDelay;
 
     // Reset RNG
@@ -316,8 +316,8 @@ void JitterClockSimAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
         rightOut[s] = yR;
 
         // Advance cursors
-        wpos   = std::fmod (wpos + oversample, static_cast<float> (kOSBufSize));
-        rpos   = std::fmod (rpos + oversample, static_cast<float> (kOSBufSize));
+        wpos   = std::fmod (wpos + oversample, static_cast<double> (kOSBufSize));
+        rpos   = std::fmod (rpos + oversample, static_cast<double> (kOSBufSize));
         inPos  = (inPos + 1) & kInputMask;
     }
 }
